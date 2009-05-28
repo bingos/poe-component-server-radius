@@ -54,15 +54,15 @@ sub test_stop {
 
 sub _authevent {
   my ($kernel,$req_id,$data,$client) = @_[KERNEL,ARG0..ARG2];
-  ok( $data->{'Framed-Protocol'} eq 'PPP', 'Framed-Protocol' );
-  ok( $data->{'User-Name'} eq 'bingos', 'User-Name' );
-  ok( $data->{'NAS-Identifier'} eq 'PoCoClientRADIUS', 'NAS-Identifier' );
-  ok( $data->{'User-Password'} eq 'moocow', 'User-Password' );
-  ok( $data->{'Service-Type'} eq '0', 'Service-Type' );
-  ok( $data->{'NAS-Port'} eq '1234', 'NAS-Port' );
+  is( $data->{'Framed-Protocol'}, 'PPP', 'Framed-Protocol' );
+  is( $data->{'User-Name'}, 'bingos', 'User-Name' );
+  is( $data->{'NAS-Identifier'}, 'PoCoClientRADIUS', 'NAS-Identifier' );
+  is( $data->{'User-Password'}, 'moocow', 'User-Password' );
+  is( $data->{'Service-Type'}, 'Framed-User', 'Service-Type' );
+  is( $data->{'NAS-Port'}, '1234', 'NAS-Port' );
   ok( defined $data->{'NAS-IP-Address'}, 'NAS-IP-Address' );
-  ok( $data->{'Called-Station-Id'} eq '0000', 'Called-Station-Id' );
-  ok( $data->{'Calling-Station-Id'} eq '01234567890', 'Calling-Station-Id' );
+  is( $data->{'Called-Station-Id'}, '0000', 'Called-Station-Id' );
+  is( $data->{'Calling-Station-Id'}, '01234567890', 'Calling-Station-Id' );
   return;
 }
 

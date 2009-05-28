@@ -9,7 +9,7 @@ use Net::Radius::Packet;
 use Net::IP qw(ip_is_ipv4);
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '1.00';
 
 use constant DATAGRAM_MAXLEN => 4096;
 use constant RADIUS_PORT => 1812;
@@ -425,7 +425,7 @@ of other sessions which register with the component to receive events.
 
 =over
 
-=item spawn
+=item C<spawn>
 
 Creates a new POE::Component::Server::RADIUS session that starts various UDP sockets. Takes one mandatory and a number of optional parameters:
 
@@ -450,7 +450,7 @@ Returns a POE::Component::Server::RADIUS object, which provides the following me
 
 =over
 
-=item add_client
+=item C<add_client>
 
 Adds a RADIUS client to the server configuration. RADIUS clients need to be registered with their IP address and a shared secret.
 Takes a number of required parameters:
@@ -459,23 +459,23 @@ Takes a number of required parameters:
   'address', an IPv4 address;
   'secret', a shared secret pass-phrase;
 
-=item del_client
+=item C<del_client>
 
 Removes a previously registered RADIUS client. Takes one argument, either a C<name> or an IPv4 address.
 
-=item session_id
+=item C<session_id>
 
 Takes no arguments. Returns the POE Session ID of the component.
 
-=item shutdown
+=item C<shutdown>
 
 Terminates the component.
 
-=item authports
+=item C<authports>
 
 Returns a list of all the UDP ports configured for authentication requests.
 
-=item acctports
+=item C<acctports>
 
 Returns a list of all the UDP ports configured for accounting requests.
 
@@ -487,7 +487,7 @@ These are events that the component will accept:
 
 =over
 
-=item register
+=item C<register>
 
 This will register the sending session to receive events from the component. It requires either one of the following parameters. You
 may specify both if you require:
@@ -499,23 +499,23 @@ The component automatically responds to accounting requests.
 
 Authentication requests require your session to send either an C<accept> or C<reject> response back to the component.
 
-=item accept
+=item C<accept>
 
 Tells the component to send an C<Access-Accept> response back to the requesting client. Requires one mandatory argument which is 
 a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be 
 RADIUS attributes that you want adding to the C<Access-Accept> response. Check with the RFC for what attributes are valid.
 
-=item reject
+=item C<reject>
 
 Tells the component to send an C<Access-Reject> response back to the requesting client. Requires one mandatory argument which is 
 a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be 
 RADIUS attributes that you want adding to the C<Access-Reject> response. Check with the RFC for what attributes are valid.
 
-=item unregister 
+=item C<unregister> 
 
 This will unregister the sending session from receiving events.
 
-=item shutdown
+=item C<shutdown>
 
 Terminates the component.
 
@@ -528,7 +528,7 @@ or both.
 
 =over
 
-=item C<acctevent> type events
+=item C<C><acctevent> type events
 
 ARG0 will be the IP address of the RADIUS client. The component will have already discarded accounting requests from clients
 which don't have a matching IP address and shared-secret. ARG1 will be hashref containing RADIUS attributes and value pairs. 
@@ -536,7 +536,7 @@ which don't have a matching IP address and shared-secret. ARG1 will be hashref c
 As the component automatically responds to valid clients with an C<Accounting-Response> packet, your session need not take any 
 further action in response to these events.
 
-=item C<authevent> type events
+=item C<C><authevent> type events
 
 ARG0 will be the IP address of the RADIUS client. The component will have already 'decrypted' the C<User-Password> provided using
 the configured shared-secret for the RADIUS client. ARG1 will be a hashref containing RADIUS attributes and value pairs. ARG3 will
@@ -558,7 +558,7 @@ Chris C<BinGOs> Williams <chris@bingosnet.co.uk>
 
 =head1 LICENSE
 
-Copyright (C) Chris Williams
+Copyright E<copy> Chris Williams
 
 This module may be used, modified, and distributed under the same terms as Perl itself. Please see the license that came with your Perl distribution for details.
 

@@ -58,7 +58,7 @@ sub _authevent {
   ok( $data->{'User-Name'} eq 'bingos', 'User-Name' );
   ok( $data->{'NAS-Identifier'} eq 'PoCoClientRADIUS', 'NAS-Identifier' );
   ok( $data->{'User-Password'} eq 'moocow', 'User-Password' );
-  ok( $data->{'Service-Type'} eq '0', 'Service-Type' );
+  ok( $data->{'Service-Type'} eq 'Framed-User', 'Service-Type' );
   ok( $data->{'NAS-Port'} eq '1234', 'NAS-Port' );
   ok( defined $data->{'NAS-IP-Address'}, 'NAS-IP-Address' );
   ok( $data->{'Called-Station-Id'} eq '0000', 'Called-Station-Id' );

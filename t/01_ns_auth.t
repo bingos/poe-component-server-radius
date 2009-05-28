@@ -53,7 +53,7 @@ sub test_stop {
 
 sub _authevent {
   my ($kernel,$req_id,$data,$client) = @_[KERNEL,ARG0..ARG2];
-  ok( $data->{'Framed-Protocol'} eq 'PPP', 'Framed-Protocol' );
+  ok( $data->{'Framed-Protocol'} eq '1', 'Framed-Protocol' );
   ok( $data->{'User-Name'} eq 'bingos', 'User-Name' );
   ok( $data->{'NAS-Identifier'} eq 'PoCoClientRADIUS', 'NAS-Identifier' );
   ok( $data->{'User-Password'} eq 'moocow', 'User-Password' );

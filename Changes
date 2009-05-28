@@ -1,6 +1,9 @@
 Changelog for POE::Component::Server::RADIUS
 ============================================
 
+1.00	Fri May 29 00:02:31 BST 2009
+	- Fixed warningsin tests.
+
 0.08	Sat Jun 28 08:28:31 BST 2008
 	- Added LICENSE information.
 
