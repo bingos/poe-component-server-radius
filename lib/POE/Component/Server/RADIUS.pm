@@ -528,7 +528,7 @@ or both.
 
 =over
 
-=item C<C><acctevent> type events
+=item C<acctevent> type events
 
 ARG0 will be the IP address of the RADIUS client. The component will have already discarded accounting requests from clients
 which don't have a matching IP address and shared-secret. ARG1 will be hashref containing RADIUS attributes and value pairs. 
@@ -536,7 +536,7 @@ which don't have a matching IP address and shared-secret. ARG1 will be hashref c
 As the component automatically responds to valid clients with an C<Accounting-Response> packet, your session need not take any 
 further action in response to these events.
 
-=item C<C><authevent> type events
+=item C<authevent> type events
 
 ARG0 will be the IP address of the RADIUS client. The component will have already 'decrypted' the C<User-Password> provided using
 the configured shared-secret for the RADIUS client. ARG1 will be a hashref containing RADIUS attributes and value pairs. ARG3 will
