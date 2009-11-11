@@ -150,6 +150,10 @@ METHODS
         Returns a list of all the UDP ports configured for accounting
         requests.
 
+    "dictionary"
+        Returns a reference to the Net::Radius::Dictionary object that was
+        supplied to "spawn". =back
+
 INPUT EVENTS
     These are events that the component will accept:
 
@@ -193,23 +197,25 @@ OUTPUT EVENTS
     component to receive, you will get either one or the other of these or
     both.
 
-    "C"<acctevent> type events
+    "acctevent" type events
         ARG0 will be the IP address of the RADIUS client. The component will
         have already discarded accounting requests from clients which don't
         have a matching IP address and shared-secret. ARG1 will be hashref
-        containing RADIUS attributes and value pairs.
+        containing RADIUS attributes and value pairs. ARG2 will be a
+        Net::Radius::Packet object representing the request.
 
         As the component automatically responds to valid clients with an
         "Accounting-Response" packet, your session need not take any further
         action in response to these events.
 
-    "C"<authevent> type events
+    "authevent" type events
         ARG0 will be the IP address of the RADIUS client. The component will
         have already 'decrypted' the "User-Password" provided using the
         configured shared-secret for the RADIUS client. ARG1 will be a
         hashref containing RADIUS attributes and value pairs. ARG3 will be a
         unique request_id required when sending "accept" or "reject" events
-        back to the component.
+        back to the component. ARG4 will be a Net::Radius::Packet object
+        representing the request.
 
         You must check the validity of the request and then issue either an
         "accept" or "reject" event back to the component using the
@@ -242,4 +248,11 @@ SEE ALSO
     <http://www.faqs.org/rfcs/rfc2138.html>
 
     <http://www.faqs.org/rfcs/rfc2866.html>
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 491:
+        You forgot a '=back' before '=head1'
 

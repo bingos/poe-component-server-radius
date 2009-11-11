@@ -9,7 +9,7 @@ use Net::Radius::Packet;
 use Net::IP qw(ip_is_ipv4);
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 use constant DATAGRAM_MAXLEN => 4096;
 use constant RADIUS_PORT => 1812;
@@ -64,6 +64,10 @@ sub session_id {
 sub shutdown {
   my $self = shift;
   $poe_kernel->post( $self->{session_id}, 'shutdown' );
+}
+
+sub dictionary {
+  return $_[0]->{dict};
 }
 
 sub add_client {
@@ -198,7 +202,7 @@ sub _get_auth_data {
 	socket => $socket,
   };
   # dispatch to interested sessions
-  $kernel->post( $_, $self->{sessions}->{$_}->{authevent}, $client, $data, $req_id )
+  $kernel->post( $_, $self->{sessions}->{$_}->{authevent}, $client, $data, $req_id, $p )
 	for grep { $self->{sessions}->{$_}->{authevent} } keys %{ $self->{sessions} };
   # set an alarm
   $self->{_requests}->{ $req_id }->{alarm_id} = 
@@ -229,7 +233,7 @@ sub _get_acct_data {
      map { ( $_, $p->attr($_) ) } $p->attributes()
   };
   # dispatch to interested sessions
-  $kernel->post( $_, $self->{sessions}->{$_}->{acctevent}, $client, $data )
+  $kernel->post( $_, $self->{sessions}->{$_}->{acctevent}, $client, $data, $p )
 	for grep { $self->{sessions}->{$_}->{acctevent} } keys %{ $self->{sessions} };
   my $rp = new Net::Radius::Packet $self->{dict};
   $rp->set_identifier($p->identifier);
@@ -479,6 +483,10 @@ Returns a list of all the UDP ports configured for authentication requests.
 
 Returns a list of all the UDP ports configured for accounting requests.
 
+=item C<dictionary>
+
+Returns a reference to the L<Net::Radius::Dictionary> object that was supplied to C<spawn>.
+
 =back
 
 =head1 INPUT EVENTS
@@ -532,6 +540,7 @@ or both.
 
 ARG0 will be the IP address of the RADIUS client. The component will have already discarded accounting requests from clients
 which don't have a matching IP address and shared-secret. ARG1 will be hashref containing RADIUS attributes and value pairs. 
+ARG2 will be a L<Net::Radius::Packet> object representing the request.
 
 As the component automatically responds to valid clients with an C<Accounting-Response> packet, your session need not take any 
 further action in response to these events.
@@ -540,7 +549,8 @@ further action in response to these events.
 
 ARG0 will be the IP address of the RADIUS client. The component will have already 'decrypted' the C<User-Password> provided using
 the configured shared-secret for the RADIUS client. ARG1 will be a hashref containing RADIUS attributes and value pairs. ARG3 will
-be a unique request_id required when sending C<accept> or C<reject> events back to the component.
+be a unique request_id required when sending C<accept> or C<reject> events back to the component. ARG4 will be a
+L<Net::Radius::Packet> object representing the request.
 
 You must check the validity of the request and then issue either an C<accept> or C<reject> event back to the component using the 
 request_id and specifying any RADIUS attributes that you wish conveyed to the client.

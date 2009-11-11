@@ -1,6 +1,11 @@
 Changelog for POE::Component::Server::RADIUS
 ============================================
 
+1.02  Wed Nov 11 00:34:05 GMT 2009
+  - Added dictionary() method
+  - Include Net::Radius::Packet in events that are sent
+  - Able suggestions made by Justin Hunter
+
 1.00	Fri May 29 00:02:31 BST 2009
 	- Fixed warningsin tests.
 

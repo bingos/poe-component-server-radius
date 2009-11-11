@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 BEGIN { use_ok('POE::Component::Server::RADIUS') };
 
 use Socket;
@@ -15,6 +15,7 @@ my $radiusd = POE::Component::Server::RADIUS->spawn( dict => $dict, authport => 
 my $self = POE::Component::Client::RADIUS->spawn( dict => $dict, options => { trace => 0 }, timeout => 5, );
 
 isa_ok ( $radiusd, 'POE::Component::Server::RADIUS' );
+isa_ok( $radiusd->dictionary, 'Net::Radius::Dictionary' );
 
 POE::Session->create(
 	inline_states => { _start => \&test_start, _stop => \&test_stop, },
