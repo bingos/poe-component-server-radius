@@ -9,7 +9,7 @@ use Net::Radius::Packet;
 use Net::IP qw(ip_is_ipv4);
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 use constant DATAGRAM_MAXLEN => 4096;
 use constant RADIUS_PORT => 1812;
@@ -235,7 +235,7 @@ sub _get_acct_data {
   # dispatch to interested sessions
   $kernel->post( $_, $self->{sessions}->{$_}->{acctevent}, $client, $data, $p )
 	for grep { $self->{sessions}->{$_}->{acctevent} } keys %{ $self->{sessions} };
-  my $rp = new Net::Radius::Packet $self->{dict};
+  my $rp = Net::Radius::Packet->new( $self->{dict} );
   $rp->set_identifier($p->identifier);
   $rp->set_authenticator($p->authenticator);
   $rp->set_code('Accounting-Response');
@@ -264,7 +264,7 @@ sub _command {
   my $code;
   $code = 'Access-Accept' if $state eq 'accept';
   $code = 'Access-Reject' if $state eq 'reject';
-  my $rp = new Net::Radius::Packet $self->{dict};
+  my $rp = Net::Radius::Packet->new( $self->{dict} );
   $rp->set_identifier( $req->{identifier} );
   $rp->set_authenticator( $req->{authenticator} );
   $rp->set_code( $code );
@@ -334,7 +334,7 @@ POE::Component::Server::RADIUS - a POE based RADIUS server component
    use strict;
    use Net::Radius::Dictionary;
    use POE qw(Component::Server::RADIUS);
-   
+
    # Lets define some users who we'll allow access if they can provide the password
    my %users = (
            aj => '0fGbqzu0cfA',
@@ -348,12 +348,12 @@ POE::Component::Server::RADIUS - a POE based RADIUS server component
            tanya => 'korvS2~Rip4f',
            tux => 'Io2obo2kT%xq',
    );
-   
+
    # We need a Net::Radius::Dictionary object to pass to the poco
    my $dict = Net::Radius::Dictionary->new( 'dictionary' );
-   
+
    my $radiusd = POE::Component::Server::RADIUS->spawn( dict => $dict );
-   
+
    # Add some NAS devices to the poco
    $radiusd->add_client( name => 'creosote', address => '192.168.1.73', secret => 'Po9hpbN^nz6n' );
    $radiusd->add_client( name => 'dunmanifestin', address => '192.168.1.17', secret => '9g~dorQuos5E' );
@@ -361,28 +361,28 @@ POE::Component::Server::RADIUS - a POE based RADIUS server component
    $radiusd->add_client( name => 'ladysybilramkin', address => '192.168.1.217', secret => 'j8yTuBfl)t2s' );
    $radiusd->add_client( name => 'mort', address => '192.168.1.229', secret => '8oEhfKm(krr0' );
    $radiusd->add_client( name => 'ysabell', address => '192.168.1.84', secret => 'i8quDld_2suH' );
-   
+
    POE::Session->create(
       package_states => [
-   	'main' => [qw(_start _authenticate _accounting)],
+	        'main' => [qw(_start _authenticate _accounting)],
       ],
       heap => { users => \%users, },
    );
-   
+
    $poe_kernel->run();
    exit 0;
-   
+
    sub _start {
      # We need to register with the poco to receive events
-     $poe_kernel->post( 
-	$radiusd->session_id(), 
-	'register', 
-	authevent => '_authenticate', 
-	acctevent => '_accounting' 
+     $poe_kernel->post(
+	    $radiusd->session_id(),
+	    'register',
+	    authevent => '_authenticate',
+	    acctevent => '_accounting'
      );
      return;
    }
-   
+
    sub _authenticate {
      my ($kernel,$sender,$heap,$client,$data,$req_id) = @_[KERNEL,SENDER,HEAP,ARG0,ARG1,ARG2];
      # Lets ignore dodgy requests
@@ -397,23 +397,23 @@ POE::Component::Server::RADIUS - a POE based RADIUS server component
         $kernel->call( $sender, 'reject', $req_id );
         return;
      }
-     # Okay everything is cool. 
+     # Okay everything is cool.
      $kernel->call( $sender, 'accept', $req_id );
      return;
    }
-   
+
    sub _accounting {
      my ($kernel,$sender,$heap,$client,$data) = @_[KERNEL,SENDER,HEAP,ARG0,ARG1];
      # Do something with the data provided, like log to a database or a file
      return;
    }
-   
+
 =head1 DESCRIPTION
 
 POE::Component::Server::RADIUS is a L<POE> component that provides Remote Authentication Dial In User Service (RADIUS) server
 services to other POE sessions and components.
 
-RADIUS is commonly used by ISPs and corporations managing access to Internet or internal networks and is 
+RADIUS is commonly used by ISPs and corporations managing access to Internet or internal networks and is
 an AAA (authentication, authorisation, and accounting) protocol.
 
 The component deals with the receiving and transmission of RADIUS packets and uses the excellent L<Net::Radius::Packet>
@@ -422,7 +422,7 @@ and L<Net::Radius::Dictionary> modules to construct the RADIUS packets.
 Currently only PAP authentication is supported. Help and advice would be appreciated on implementing others. See contact details
 below.
 
-The component does not deal with the actual authentication of users nor with the logging of accounting data. That is the job 
+The component does not deal with the actual authentication of users nor with the logging of accounting data. That is the job
 of other sessions which register with the component to receive events.
 
 =head1 CONSTRUCTOR
@@ -439,12 +439,12 @@ Creates a new POE::Component::Server::RADIUS session that starts various UDP soc
   'authport', specify a port to listen on for authentication requests;
   'acctport', specify a port to listen on for accounting requests;
   'legacy', set to a true value to make the component honour legacy listener ports;
-  'timeout', set a time out in seconds that the poco waits for sessions to respond to auth requests, 
+  'timeout', set a time out in seconds that the poco waits for sessions to respond to auth requests,
 	     default 10;
 
 By default the component listens on ports C<1812> and C<1813> for authentication and accounting requests, respectively. These are
 the C<official> ports from the applicable RFCs. Setting C<legacy> option makes the component also listen on ports C<1645> and
-C<1646>. 
+C<1646>.
 
 Returns a POE::Component::Server::RADIUS object, which provides the following methods:
 
@@ -509,17 +509,17 @@ Authentication requests require your session to send either an C<accept> or C<re
 
 =item C<accept>
 
-Tells the component to send an C<Access-Accept> response back to the requesting client. Requires one mandatory argument which is 
-a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be 
+Tells the component to send an C<Access-Accept> response back to the requesting client. Requires one mandatory argument which is
+a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be
 RADIUS attributes that you want adding to the C<Access-Accept> response. Check with the RFC for what attributes are valid.
 
 =item C<reject>
 
-Tells the component to send an C<Access-Reject> response back to the requesting client. Requires one mandatory argument which is 
-a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be 
+Tells the component to send an C<Access-Reject> response back to the requesting client. Requires one mandatory argument which is
+a request_id previously given you by the component (See OUTPUT EVENTS for details). The remaining parameters are assumed to be
 RADIUS attributes that you want adding to the C<Access-Reject> response. Check with the RFC for what attributes are valid.
 
-=item C<unregister> 
+=item C<unregister>
 
 This will unregister the sending session from receiving events.
 
@@ -532,17 +532,17 @@ Terminates the component.
 =head1 OUTPUT EVENTS
 
 Dependent on which event types your session registered with the component to receive, you will get either one or the other of these
-or both. 
+or both.
 
 =over
 
 =item C<acctevent> type events
 
 ARG0 will be the IP address of the RADIUS client. The component will have already discarded accounting requests from clients
-which don't have a matching IP address and shared-secret. ARG1 will be hashref containing RADIUS attributes and value pairs. 
+which don't have a matching IP address and shared-secret. ARG1 will be hashref containing RADIUS attributes and value pairs.
 ARG2 will be a L<Net::Radius::Packet> object representing the request.
 
-As the component automatically responds to valid clients with an C<Accounting-Response> packet, your session need not take any 
+As the component automatically responds to valid clients with an C<Accounting-Response> packet, your session need not take any
 further action in response to these events.
 
 =item C<authevent> type events
@@ -552,12 +552,12 @@ the configured shared-secret for the RADIUS client. ARG1 will be a hashref conta
 be a unique request_id required when sending C<accept> or C<reject> events back to the component. ARG4 will be a
 L<Net::Radius::Packet> object representing the request.
 
-You must check the validity of the request and then issue either an C<accept> or C<reject> event back to the component using the 
+You must check the validity of the request and then issue either an C<accept> or C<reject> event back to the component using the
 request_id and specifying any RADIUS attributes that you wish conveyed to the client.
 
 The component times out authentication requests to prevent stale requests. This timeout is configurable through the C<spawn> constructor.
 
-To get timely responses back to RADIUS clients it is suggested that you use C<call> instead of C<post> to send 
+To get timely responses back to RADIUS clients it is suggested that you use C<call> instead of C<post> to send
 C<accept> or C<reject> events back to the component.
 
 =back
