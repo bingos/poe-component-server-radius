@@ -11,7 +11,7 @@ author_tests 'xt';
 perl_version '5.006';
 build_requires 'Test::More' => 0.47;
 requires 'Math::Random' => 0.69;
-requires 'Net::IP' => 1.25;
+requires 'Net::IP::Minimal' => 0.02;
 requires 'Net::Radius::Packet' => 1.55;
 requires 'Net::Radius::Dictionary' => 1.55;
 requires 'POE'    => 0.9999;

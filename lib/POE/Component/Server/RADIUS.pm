@@ -6,10 +6,10 @@ use Socket;
 use POE;
 use Net::Radius::Dictionary;
 use Net::Radius::Packet;
-use Net::IP qw(ip_is_ipv4);
+use Net::IP::Minimal qw(ip_is_ipv4);
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 use constant DATAGRAM_MAXLEN => 4096;
 use constant RADIUS_PORT => 1812;
