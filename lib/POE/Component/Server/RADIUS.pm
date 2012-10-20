@@ -1,5 +1,7 @@
 package POE::Component::Server::RADIUS;
 
+#ABSTRACT: a POE based RADIUS server component
+
 use strict;
 use warnings;
 use Socket;
@@ -7,9 +9,6 @@ use POE;
 use Net::Radius::Dictionary;
 use Net::Radius::Packet;
 use Net::IP::Minimal qw(ip_is_ipv4);
-use vars qw($VERSION);
-
-$VERSION = '1.06';
 
 use constant DATAGRAM_MAXLEN => 4096;
 use constant RADIUS_PORT => 1812;
@@ -323,11 +322,9 @@ sub unregister {
 }
 
 1;
-__END__
 
-=head1 NAME
+=pod
 
-POE::Component::Server::RADIUS - a POE based RADIUS server component
 
 =head1 SYNOPSIS
 
@@ -561,16 +558,6 @@ To get timely responses back to RADIUS clients it is suggested that you use C<ca
 C<accept> or C<reject> events back to the component.
 
 =back
-
-=head1 AUTHOR
-
-Chris C<BinGOs> Williams <chris@bingosnet.co.uk>
-
-=head1 LICENSE
-
-Copyright E<copy> Chris Williams
-
-This module may be used, modified, and distributed under the same terms as Perl itself. Please see the license that came with your Perl distribution for details.
 
 =head1 SEE ALSO
 
